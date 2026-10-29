@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хімічний Детектив: Таємниця Електролітів</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .custom-card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Pulse highlight for current questions */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.015); }
+        }
+        .pulse-card {
+            animation: subtlePulse 3s infinite ease-in-out;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-slate-100 text-slate-900 selection:bg-amber-200">
+
+    <!-- Header Section (Large Font & Clean Light Design) -->
+    <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-30 shadow-sm py-4 px-4 sm:px-8">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="bg-amber-500 text-white w-12 h-12 rounded-2xl shadow-md shadow-amber-500/20 flex items-center justify-center text-2xl flex-shrink-0 font-black">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-black uppercase tracking-widest text-amber-600 block">Хімічний тренажер • 9 клас</span>
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Хімічний Детектив: Таємниця Електролітів</h1>
+                </div>
+            </div>
+            
+            <!-- Game Score & Badges -->
+            <div class="flex items-center gap-4 bg-slate-50 border-2 border-slate-200 px-4 py-2 rounded-2xl">
+                <div class="text-center px-2">
+                    <span class="text-xs font-bold text-slate-500 block uppercase tracking-wider">Бали</span>
+                    <span id="score-display" class="text-2xl font-black text-amber-600">0</span>
+                </div>
+                <div class="h-8 w-0.5 bg-slate-200"></div>
+                <div class="text-center px-2">
+                    <span class="text-xs font-bold text-slate-500 block uppercase tracking-wider">Рівень</span>
+                    <span id="level-display" class="text-lg font-black text-slate-800">1 / 3</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="max-w-5xl w-full mx-auto px-4 py-6 flex-grow flex flex-col justify-center">
+
+        <!-- Navigation Stage Selector Tabs -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+            <button id="nav-btn-1" onclick="switchStage(1)" class="stage-nav-btn py-3 px-2 sm:px-4 rounded-2xl bg-amber-500 text-white font-black text-sm sm:text-base border-2 border-amber-600 shadow-md transition-all flex items-center justify-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-white text-amber-600 text-xs font-black flex items-center justify-center shadow-sm">1</span>
+                <span class="truncate">Митний контроль</span>
+            </button>
+            <button id="nav-btn-2" onclick="switchStage(2)" class="stage-nav-btn py-3 px-2 sm:px-4 rounded-2xl bg-white text-slate-700 hover:bg-slate-50 font-bold text-sm sm:text-base border-2 border-slate-200 shadow-sm transition-all flex items-center justify-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-black flex items-center justify-center">2</span>
+                <span class="truncate">Детектив рівнянь</span>
+            </button>
+            <button id="nav-btn-3" onclick="switchStage(3)" class="stage-nav-btn py-3 px-2 sm:px-4 rounded-2xl bg-white text-slate-700 hover:bg-slate-50 font-bold text-sm sm:text-base border-2 border-slate-200 shadow-sm transition-all flex items-center justify-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-black flex items-center justify-center">3</span>
+                <span class="truncate">Лабораторія α</span>
+            </button>
+        </div>
+
+        <!-- ================= STAGE 1: CUSTOMS SORTING ================= -->
+        <div id="stage-1" class="stage-container bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 custom-card-shadow space-y-6">
+            <div class="border-b-2 border-slate-100 pb-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Рівень 1: Сортування</span>
+                    <span class="text-xs font-bold text-slate-400" id="stage1-progress">Прогрес: 0/6</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Хімічний митний контроль</h2>
+                <p class="text-sm sm:text-base text-slate-600 font-medium mt-1">
+                    Розподіліть речовини за правильними категоріями відповідно до їхньої здатності дисоціювати у розчині.
+                </p>
+            </div>
+
+            <!-- Current Chemical Card to Sort -->
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-3xl p-6 text-center space-y-3 pulse-card relative overflow-hidden" id="sorting-card">
+                <span class="text-xs font-black text-amber-700 uppercase tracking-wider block">Поточна речовина:</span>
+                <div class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" id="sort-chemical-name">Хлоридна кислота</div>
+                <div class="text-xl font-bold font-mono text-amber-700 bg-white/80 inline-block px-4 py-1.5 rounded-2xl border border-amber-200 shadow-sm" id="sort-chemical-formula">HCl</div>
+            </div>
+
+            <!-- Target Drop / Click Categories -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <button onclick="checkSorting('strong')" class="p-5 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 border-2 border-emerald-400 text-emerald-950 font-black text-base sm:text-lg transition-all text-center flex flex-col items-center gap-2 group active:scale-[0.98]">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-xl shadow-md group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <span>Сильний електроліт</span>
+                    <span class="text-xs font-semibold text-emerald-700 font-normal">100% розпад на йони (→)</span>
+                </button>
+
+                <button onclick="checkSorting('weak')" class="p-5 rounded-2xl bg-amber-50 hover:bg-amber-100/80 border-2 border-amber-400 text-amber-950 font-black text-base sm:text-lg transition-all text-center flex flex-col items-center gap-2 group active:scale-[0.98]">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xl shadow-md group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                    </div>
+                    <span>Слабкий електроліт</span>
+                    <span class="text-xs font-semibold text-amber-700 font-normal">Частковий розпад (⇌)</span>
+                </button>
+
+                <button onclick="checkSorting('none')" class="p-5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 border-2 border-slate-300 text-slate-900 font-black text-base sm:text-lg transition-all text-center flex flex-col items-center gap-2 group active:scale-[0.98]">
+                    <div class="w-12 h-12 rounded-xl bg-slate-500 text-white flex items-center justify-center text-xl shadow-md group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+                    <span>Неелектроліт</span>
+                    <span class="text-xs font-semibold text-slate-600 font-normal">Не розпадається взагалі</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= STAGE 2: EQUATION FIXER ================= -->
+        <div id="stage-2" class="stage-container hidden bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 custom-card-shadow space-y-6">
+            <div class="border-b-2 border-slate-100 pb-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Рівень 2: Детектив рівнянь</span>
+                    <span class="text-xs font-bold text-slate-400" id="stage2-progress">Питання: 1/4</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Знайди хімічну помилку</h2>
+                <p class="text-sm sm:text-base text-slate-600 font-medium mt-1">
+                    Проаналізуйте записане рівняння дисоціації та визначте, чи припустився недосвідчений лаборант помилки.
+                </p>
+            </div>
+
+            <!-- Chemical Equation Box -->
+            <div class="bg-slate-50 border-2 border-slate-300 rounded-3xl p-6 text-center space-y-2">
+                <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider block" id="eq-substance-name">Сульфідна кислота:</span>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900" id="eq-formula-display">H₂S → H⁺ + HS⁻</div>
+            </div>
+
+            <!-- Answer Options -->
+            <div class="space-y-3" id="eq-options-container">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- ================= STAGE 3: ALPHA CALCULATOR ================= -->
+        <div id="stage-3" class="stage-container hidden bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 custom-card-shadow space-y-6">
+            <div class="border-b-2 border-slate-100 pb-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Рівень 3: Лабораторія α</span>
+                    <span class="text-xs font-bold text-slate-400" id="stage3-progress">Задача 1/2</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Обчислення ступеня дисоціації</h2>
+                <p class="text-sm sm:text-base text-slate-600 font-medium mt-1">
+                    Скористайтеся формулою <span class="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">α = (n_дис / n₀) × 100%</span> для вирішення детективної задачі.
+                </p>
+            </div>
+
+            <!-- Problem Context -->
+            <div class="bg-sky-50 border-2 border-sky-200 rounded-3xl p-5 space-y-3">
+                <div class="flex items-center gap-2 text-sky-900 font-black text-base sm:text-lg">
+                    <i class="fa-solid fa-flask text-sky-600"></i>
+                    <span>Умова експерименту:</span>
+                </div>
+                <p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed" id="calc-problem-text">
+                    У стакані з водою розчинили 10 моль сульфідної кислоти (H₂S). Лабораторні вимірювання показали, що на йони розпалося лише 0.05 моль молекул. Обчисліть ступінь дисоціації α.
+                </p>
+            </div>
+
+            <!-- Input / Selection Form -->
+            <div class="space-y-4">
+                <label class="block text-sm font-extrabold text-slate-700">Оберіть обчислене значення α та висновок про силу електроліту:</label>
+                <div class="space-y-3" id="calc-options-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Modal / Notification Banner -->
+        <div id="feedback-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-200 space-y-4 text-center">
+                <div id="feedback-icon" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black">
+                    <!-- Icon populated dynamically -->
+                </div>
+                <h3 class="text-2xl font-black text-slate-900" id="feedback-title">Результат</h3>
+                <p class="text-sm sm:text-base font-semibold text-slate-600" id="feedback-message">Опис підказки...</p>
+                <button onclick="closeFeedback()" class="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-base shadow-md transition-all">
+                    Зрозуміло! Продовжити
+                </button>
+            </div>
+        </div>
+
+        <!-- Final Victory Screen -->
+        <div id="victory-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border-2 border-slate-200 space-y-6 text-center">
+                <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-3xl mx-auto flex items-center justify-center text-4xl font-black shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-2xl sm:text-3xl font-black text-slate-900">Вітаємо, Головний Детективе!</h3>
+                    <p class="text-sm sm:text-base font-semibold text-slate-600">
+                        Ви успішно пройшли всі випробування, розкрили таємниці дисоціації та довели свою майстерність у хімії!
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 flex justify-around items-center">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 block uppercase">Ваш результат</span>
+                        <span id="final-score" class="text-3xl font-black text-amber-600">0</span>
+                    </div>
+                    <div class="h-10 w-0.5 bg-slate-200"></div>
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 block uppercase">Звання</span>
+                        <span class="text-base font-black text-emerald-600 block">Експерт-Електроліт</span>
+                    </div>
+                </div>
+
+                <button onclick="restartGame()" class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Грати знову
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t-2 border-slate-200 py-3 text-center text-xs font-semibold text-slate-400">
+        Інтерактивний навчальний тренажер з хімії • 9 клас
+    </footer>
+
+    <!-- Game Logic Engine Script -->
+    <script>
+        // Game State
+        let currentScore = 0;
+        let currentStage = 1;
+
+        // --- STAGE 1 DATA (Expanded & Shuffled Answers) ---
+        const sortingItems = [
+            { name: "Оцтова кислота", formula: "CH₃COOH", type: "weak" },
+            { name: "Калій нітрат", formula: "KNO₃", type: "strong" },
+            { name: "Цукор (Сахароза)", formula: "C₁₂H₂₂O₁₁", type: "none" },
+            { name: "Хлоридна кислота", formula: "HCl", type: "strong" },
+            { name: "Сульфідна кислота", formula: "H₂S", type: "weak" },
+            { name: "Етанол (Спирт)", formula: "C₂H₅OH", type: "none" },
+            { name: "Натрій гідроксид", formula: "NaOH", type: "strong" },
+            { name: "Водний розчин амоніаку", formula: "NH₃ · H₂O", type: "weak" },
+            { name: "Глюкоза", formula: "C₆H₁₂O₆", type: "none" },
+            { name: "Сульфатна кислота", formula: "H₂SO₄", type: "strong" },
+            { name: "Лимонна кислота", formula: "C₆H₈O₇", type: "weak" },
+            { name: "Барій гідроксид", formula: "Ba(OH)₂", type: "strong" }
+        ];
+        let sortIndex = 0;
+
+        // --- STAGE 2 DATA (Expanded with 6 Questions) ---
+        const equationQuestions = [
+            {
+                substance: "Сульфідна кислота (слабка кислота)",
+                display: "H₂S → H⁺ + HS⁻",
+                correct: false,
+                explanation: "Помилка! H₂S — слабкий електроліт, тому дисоціація є оборотною. У рівнянні має стояти знак оборотності (⇌), а не пряма стрілка (→).",
+                options: [
+                    { text: "Рівняння записано вірно", isCorrect: false },
+                    { text: "Помилка у стрілці: має бути знак оборотності (⇌)", isCorrect: true },
+                    { text: "Помилка у формулах продуктів", isCorrect: false }
+                ]
+            },
+            {
+                substance: "Нітратна кислота (сильна кислота)",
+                display: "HNO₃ ⇌ H⁺ + NO₃⁻",
+                correct: false,
+                explanation: "Помилка! HNO₃ — сильний електроліт, що дисоціює повністю. Потрібно ставити пряму стрілку (→), а не знак оборотності (⇌).",
+                options: [
+                    { text: "Помилка у стрілці: має бути пряма стрілка (→)", isCorrect: true },
+                    { text: "Рівняння записано вірно", isCorrect: false },
+                    { text: "Нітратна кислота взагалі не дисоціює", isCorrect: false }
+                ]
+            },
+            {
+                substance: "Кальцій хлорид (розчинна сіль)",
+                display: "CaCl₂ → Ca²⁺ + 2Cl⁻",
+                correct: true,
+                explanation: "Вірно! Усі розчинні солі є сильними електролітами. Дисоціація є необоротною (→) і коефіцієнт біля Cl⁻ враховано правильно.",
+                options: [
+                    { text: "Рівняння записано повністю вірно!", isCorrect: true },
+                    { text: "Помилка: має бути знак оборотності (⇌)", isCorrect: false },
+                    { text: "Помилка в зарядах йона Ca²⁺", isCorrect: false }
+                ]
+            },
+            {
+                substance: "Оцтова кислота (слабка органічна кислота)",
+                display: "CH₃COOH → H⁺ + CH₃COO⁻",
+                correct: false,
+                explanation: "Помилка! Оцтова кислота є слабким електролітом. У її рівнянні дисоціації обовязково повинен бути знак оборотності (⇌).",
+                options: [
+                    { text: "Рівняння записано вірно", isCorrect: false },
+                    { text: "Замість стрілки (→) має стояти знак оборотності (⇌)", isCorrect: true },
+                    { text: "Оцтова кислота не розпадається на йони", isCorrect: false }
+                ]
+            },
+            {
+                substance: "Водний розчин амоніаку (слабка основа)",
+                display: "NH₃ · H₂O ⇌ NH₄⁺ + OH⁻",
+                correct: true,
+                explanation: "Чудово! Водний розчин амоніаку є слабким електролітом, тому використання знака оборотності (⇌) цілком виправдане.",
+                options: [
+                    { text: "Рівняння записано повністю вірно!", isCorrect: true },
+                    { text: "Помилка: має бути пряма стрілка (→)", isCorrect: false },
+                    { text: "Амоніак є сильним електролітом", isCorrect: false }
+                ]
+            },
+            {
+                substance: "Натрій сульфат (розчинна сіль)",
+                display: "Na₂SO₄ ⇌ 2Na⁺ + SO₄²⁻",
+                correct: false,
+                explanation: "Помилка! Na₂SO₄ — це розчинна сіль, а отже сильний електроліт. Дисоціація відбувається повністю (→), а не оборотно (⇌).",
+                options: [
+                    { text: "Рівняння записано вірно", isCorrect: false },
+                    { text: "Помилка у стрілці: для сильного електроліту потрібна пряма стрілка (→)", isCorrect: true },
+                    { text: "Помилка в коефіцієнті біля Na⁺", isCorrect: false }
+                ]
+            }
+        ];
+        let eqIndex = 0;
+
+        // --- STAGE 3 DATA (Expanded with 4 Problems) ---
+        const calcQuestions = [
+            {
+                problem: "У стакані з водою розчинили 10 моль сульфідної кислоти (H₂S). Вимірювання показали, що на йони розпалося лише 0.05 моль молекул. Обчисліть ступінь дисоціації α.",
+                options: [
+                    { text: "α = 0.5% (Слабкий електроліт)", isCorrect: true, exp: "Правильно! α = (0.05 / 10) × 100% = 0.5%. Оскільки α < 3%, H₂S є слабким електролітом." },
+                    { text: "α = 5% (Середньої сили)", isCorrect: false, exp: "Невірно. Перевірте ділення: 0.05 / 10 = 0.005, що при множенні на 100% дає 0.5%." },
+                    { text: "α = 50% (Сильний електроліт)", isCorrect: false, exp: "Помилка у розрахунках!" }
+                ]
+            },
+            {
+                problem: "Для 0.1 М розчину оцтової кислоти ступінь дисоціації α = 1.3%. Скільки молекул розпадеться на йони, якщо всього у розчин помістити 1000 молекул цієї кислоти?",
+                options: [
+                    { text: "130 молекул", isCorrect: false, exp: "Невірно. 1.3% від 1000 — це 13 молекул." },
+                    { text: "13 молекул", isCorrect: true, exp: "Чудово! N_дис = (1.3% / 100%) × 1000 = 13 молекул розпадуться на йони." },
+                    { text: "1300 молекул", isCorrect: false, exp: "Кількість розпалих молекул не може перевищувати початкову!" }
+                ]
+            },
+            {
+                problem: "У 1 л води розчинили 5 моль фторидної кислоти (HF). Аналіз показав наявність 0.06 моль йонів Гідрогену H⁺. Знайдіть α та визначте групу кислоти.",
+                options: [
+                    { text: "α = 1.2% (Слабкий електроліт)", isCorrect: true, exp: "Вірно! α = (0.06 / 5) × 100% = 1.2%. HF за цієї концентрації поводиться як слабкий електроліт." },
+                    { text: "α = 12% (Електроліт середньої сили)", isCorrect: false, exp: "Невірно. 0.06 / 5 = 0.012, що дорівнює 1.2%." },
+                    { text: "α = 0.12% (Слабкий електроліт)", isCorrect: false, exp: "Помилка у розрядній сітці відсотків!" }
+                ]
+            },
+            {
+                problem: "Розчин містить 200 молекул сульфатної кислоти H₂SO₄. Скільки з них розпадеться на йони, якщо це сильний електроліт (α ≈ 100%)?",
+                options: [
+                    { text: "Усі 200 молекул", isCorrect: true, exp: " Абсолютно вірно! Сильні електроліти розпадаються майже на 100%." },
+                    { text: "Лише 2 молекули", isCorrect: false, exp: "Це було б вірно лише для слабкого електроліту з α = 1%." },
+                    { text: "Жодна молекула", isCorrect: false, exp: "H₂SO₄ — сильний електроліт!" }
+                ]
+            }
+        ];
+        let calcIndex = 0;
+
+        // --- GAME CONTROLLER FUNCTIONS ---
+
+        function updateScore(points) {
+            currentScore += points;
+            document.getElementById('score-display').innerText = currentScore;
+        }
+
+        function switchStage(stageNum) {
+            currentStage = stageNum;
+            document.getElementById('level-display').innerText = `${stageNum} / 3`;
+
+            // Navigation Buttons Visual Styling
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`nav-btn-${i}`);
+                if (i === stageNum) {
+                    btn.className = "stage-nav-btn py-3 px-2 sm:px-4 rounded-2xl bg-amber-500 text-white font-black text-sm sm:text-base border-2 border-amber-600 shadow-md transition-all flex items-center justify-center gap-2";
+                } else {
+                    btn.className = "stage-nav-btn py-3 px-2 sm:px-4 rounded-2xl bg-white text-slate-700 hover:bg-slate-50 font-bold text-sm sm:text-base border-2 border-slate-200 shadow-sm transition-all flex items-center justify-center gap-2";
+                }
+            }
+
+            // Toggle Stage Containers
+            document.querySelectorAll('.stage-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`stage-${stageNum}`).classList.remove('hidden');
+
+            if (stageNum === 1) renderSortingStage();
+            if (stageNum === 2) renderEquationStage();
+            if (stageNum === 3) renderCalcStage();
+        }
+
+        // --- STAGE 1 LOGIC ---
+        function renderSortingStage() {
+            if (sortIndex >= sortingItems.length) {
+                switchStage(2);
+                return;
+            }
+
+            const item = sortingItems[sortIndex];
+            document.getElementById('sort-chemical-name').innerText = item.name;
+            document.getElementById('sort-chemical-formula').innerText = item.formula;
+            document.getElementById('stage1-progress').innerText = `Прогрес: ${sortIndex}/${sortingItems.length}`;
+        }
+
+        function checkSorting(selectedType) {
+            const currentItem = sortingItems[sortIndex];
+
+            if (selectedType === currentItem.type) {
+                updateScore(15);
+                showFeedback(true, "Правильно!", `${currentItem.name} (${currentItem.formula}) віднесено до вірної категорії.`);
+            } else {
+                showFeedback(false, "Помилка!", `${currentItem.name} має інший тип дисоціації.`);
+            }
+
+            sortIndex++;
+            renderSortingStage();
+        }
+
+        // --- STAGE 2 LOGIC ---
+        function renderEquationStage() {
+            if (eqIndex >= equationQuestions.length) {
+                switchStage(3);
+                return;
+            }
+
+            const q = equationQuestions[eqIndex];
+            document.getElementById('eq-substance-name').innerText = q.substance;
+            document.getElementById('eq-formula-display').innerText = q.display;
+            document.getElementById('stage2-progress').innerText = `Питання: ${eqIndex + 1}/${equationQuestions.length}`;
+
+            const optionsContainer = document.getElementById('eq-options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 hover:border-amber-400 font-bold text-base text-slate-800 transition-all flex items-center justify-between group active:scale-[0.99]";
+                btn.innerHTML = `
+                    <span>${opt.text}</span>
+                    <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-amber-500 transition-colors"></i>
+                `;
+                btn.onclick = () => checkEquationOption(opt.isCorrect, q.explanation);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkEquationOption(isCorrect, explanation) {
+            if (isCorrect) {
+                updateScore(20);
+                showFeedback(true, "Чудова детективна робота!", explanation);
+            } else {
+                showFeedback(false, "Не зовсім вірно...", explanation);
+            }
+
+            eqIndex++;
+            renderEquationStage();
+        }
+
+        // --- STAGE 3 LOGIC ---
+        function renderCalcStage() {
+            const q = calcQuestions[calcIndex];
+            document.getElementById('calc-problem-text').innerText = q.problem;
+            document.getElementById('stage3-progress').innerText = `Задача: ${calcIndex + 1}/${calcQuestions.length}`;
+
+            const container = document.getElementById('calc-options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 font-extrabold text-base text-slate-900 transition-all flex items-center justify-between group active:scale-[0.99]";
+                btn.innerHTML = `
+                    <span>${opt.text}</span>
+                    <i class="fa-solid fa-calculator text-slate-300 group-hover:text-amber-500 transition-colors"></i>
+                `;
+                btn.onclick = () => checkCalcOption(opt.isCorrect, opt.exp);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkCalcOption(isCorrect, expText) {
+            if (isCorrect) {
+                updateScore(25);
+                showFeedback(true, "Розрахунки вірні!", expText);
+            } else {
+                showFeedback(false, "Помилка в обчисленнях!", expText);
+            }
+
+            calcIndex++;
+        }
+
+        // --- FEEDBACK & MODALS ---
+        function showFeedback(isSuccess, title, message) {
+            const modal = document.getElementById('feedback-modal');
+            const icon = document.getElementById('feedback-icon');
+
+            if (isSuccess) {
+                icon.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black bg-emerald-100 text-emerald-600";
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                icon.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black bg-rose-100 text-rose-600";
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            }
+
+            document.getElementById('feedback-title').innerText = title;
+            document.getElementById('feedback-message').innerText = message;
+            modal.classList.remove('hidden');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+
+            // Check if game or stage completed AFTER feedback modal is closed
+            if (currentStage === 3 && calcIndex >= calcQuestions.length) {
+                showVictory();
+            } else if (currentStage === 3) {
+                renderCalcStage();
+            }
+        }
+
+        function showVictory() {
+            document.getElementById('final-score').innerText = currentScore;
+            document.getElementById('victory-modal').classList.remove('hidden');
+        }
+
+        function restartGame() {
+            currentScore = 0;
+            sortIndex = 0;
+            eqIndex = 0;
+            calcIndex = 0;
+            document.getElementById('score-display').innerText = "0";
+            document.getElementById('victory-modal').classList.add('hidden');
+            switchStage(1);
+        }
+
+        // Initialize stage on load
+        window.onload = function() {
+            switchStage(1);
+        };
+    </script>
+</body>
+</html>
